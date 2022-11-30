@@ -1,0 +1,23 @@
+server:
+ port: 8080
+spring:
+ application:
+  name: wallet
+ datasource:
+  password: adminadmin
+  url: jdbc:mysql://awsdb.cegwrgmjeks8.us-east-1.rds.amazonaws.com:3306/wallet_v1
+  username: admin
+ jpa:
+  hibernate:
+   ddl-auto: update
+  properties:
+   hibernate:
+    dialect: org.hibernate.dialect.MySQL8Dialect
+    format_sql: true
+  show-sql: true
+
+spring.output.ansi.enabled: always
+eureka:
+ client:
+  service-url:
+   default-zone: http://localhost:8761/eureka
