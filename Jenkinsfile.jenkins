@@ -1,0 +1,53 @@
+pipeline {
+  agent { label 'default' }
+  tools {
+    maven 'maven-3.6.3'
+  }
+  options {
+    skipStagesAfterUnstable()
+  }
+  environment {
+	DATE = new Date().format('yy.M')
+	TAG = "${DATE}.${BUILD_NUMBER}"
+    }
+  stages {
+    stage('Clone repository') {
+      steps {
+        script {
+          checkout scm
+        }
+      }
+    }
+    stage('Build') {
+      steps {
+        withMaven {
+          sh "echo 'building from: ' \$(hostname)"
+          sh "mvn clean package -Dmaven.test.failure.ignore=true"
+          sh "mkdir -p target/dependency && (cd target/dependency; jar -xf ../*SNAPSHOT.jar)"
+        }
+      }
+	}    
+	stage('Docker Build') {
+	  steps {
+		script {
+		  app = docker.build("portfolio_wallet:${TAG}")
+        }
+      }
+    }
+    stage('Deploy') {
+      steps {
+        script {
+          docker.withRegistry('https://580044464645.dkr.ecr.us-east-1.amazonaws.com', 'ecr:us-east-1:aws-credentials') {
+            app.push("${env.BUILD_NUMBER}")
+            app.push("latest")
+          }
+        }
+      }
+    }
+  }
+  post {
+    always {
+      junit(testResults: 'target/surefire-reports/*.xml', allowEmptyResults : true)
+    }
+  }
+}
