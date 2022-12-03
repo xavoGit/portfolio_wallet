@@ -44,6 +44,12 @@ pipeline {
         }
       }
     }
+    stage('Trigger Update Pipeline') {
+      steps{
+	    echo "triggering update pipeline"
+	    build job: 'updatemanifest', parameters: [string(name: 'MODULE', 'wallet'), string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]  
+      }
+	}
   }
   post {
     always {
