@@ -40,7 +40,7 @@ public class AccountService {
 
 	public Object getCharges(Account account) {
 		Object obj = restTemplate.getForObject(
-				"http://TRANSACTIONS/api/v1/transactions/charges?accountId={accountId}",
+				"http://transactions-service:8081/api/v1/transactions/charges?accountId={accountId}",
 				Object.class,
 				account.getId());
 		return obj;
